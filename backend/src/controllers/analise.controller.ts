@@ -1,4 +1,5 @@
 import { Request, Response } from "express";
+import { analiseService } from "../services/analise.service";
 
 export class AnaliseController {
   async analisar(
@@ -11,9 +12,12 @@ export class AnaliseController {
       });
     }
 
+    const resultado =
+      await analiseService.analisarImagem();
+
     return res.status(200).json({
-      message: "Imagem recebida com sucesso",
-      arquivo: req.file.filename
+      arquivo: req.file.filename,
+      resultado
     });
   }
 }
