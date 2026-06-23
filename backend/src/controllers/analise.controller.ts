@@ -13,7 +13,9 @@ export class AnaliseController {
     }
 
     const resultado =
-      await analiseService.analisarImagem();
+      await analiseService.analisarImagem(
+        req.file.path
+      );
 
     return res.status(200).json({
       arquivo: req.file.filename,
