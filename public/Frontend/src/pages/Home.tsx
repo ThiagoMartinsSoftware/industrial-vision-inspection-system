@@ -1,93 +1,38 @@
-import { useState } from "react";
-import { api } from "../services/api";
-import "../app.css";
+import CameraFeed from "../components/CameraFeed/CameraFeed";
+import ResultCard from "../components/ResultCard/ResultCard";
+import StatusPanel from "../components/StatusPanel/StatusPanel";
+import HistoryPanel from "../components/HistoryPanel/HistoryPanel";
+import ShiftPanel from "../components/ShiftPanel/ShiftPanel";
 
-export function Home() {
-  const [imagem, setImagem] = useState<File | null>(null);
-  const [preview, setPreview] = useState("");
-  const [resultado, setResultado] = useState<any>(null);
-  const [carregando, setCarregando] = useState(false);
+import "../styles/dashboard.css";
 
-  async function analisarImagem() {
-    if (!imagem) return;
-
-    const formData = new FormData();
-
-    formData.append("imagem", imagem);
-
-    try {
-      setCarregando(true);
-
-      const response = await api.post(
-        "/analisar",
-        formData
-      );
-
-      setResultado(response.data.resultado);
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setCarregando(false);
-    }
-  }
-
-  function selecionarImagem(
-    event: React.ChangeEvent<HTMLInputElement>
-  ) {
-    const arquivo = event.target.files?.[0];
-
-    if (!arquivo) return;
-
-    setImagem(arquivo);
-
-    setPreview(
-      URL.createObjectURL(arquivo)
-    );
-  }
-
+export default function Home() {
   return (
-    <div className="container">
-      <h1>
-        Industrial Vision Inspection
-      </h1>
+    <div className="dashboard">
 
-      <input
-        type="file"
-        accept="image/*"
-        onChange={selecionarImagem}
-      />
+      <header className="topbar">
+        <h1>INDUSTRIAL VISION INSPECTION SYSTEM</h1>
 
-      {preview && (
-        <img
-          src={preview}
-          alt="Preview"
-          className="preview"
-        />
-      )}
-
-      <button
-        onClick={analisarImagem}
-      >
-        {carregando
-          ? "Analisando..."
-          : "Analisar"}
-      </button>
-
-      {resultado && (
-        <div className="resultado">
-          <h2>
-            {resultado.status ===
-            "APROVADA"
-              ? "✅ APROVADA"
-              : "❌ REPROVADA"}
-          </h2>
-
-          <p>
-            Pinos Detectados:{" "}
-            {resultado.pinos}
-          </p>
+        <div className="running">
+          <span className="dot"></span>
+          RUNNING
         </div>
-      )}
+      </header>
+
+      <section className="inspection">
+
+        <CameraFeed />
+
+        <ResultCard />
+
+      </section>
+
+      <StatusPanel />
+
+      <HistoryPanel />
+
+      <ShiftPanel />
+
     </div>
   );
 }
