@@ -1,8 +1,28 @@
-import { useEffect, useRef } from "react";
+import "./CameraFeed.module.css";
 
-export default function CameraFeed() {
+import { useEffect, useRef, useState } from "react";
+
+type CameraFeedProps = {
+    onCapture: (file: File) => void;
+};
+
+export default function CameraFeed({
+    onCapture
+}: CameraFeedProps) {
 
     const videoRef = useRef<HTMLVideoElement>(null);
+
+    const canvasRef = useRef<HTMLCanvasElement>(null);
+
+    const [cameraOnline, setCameraOnline] = useState(false);
+
+    const [ultimaCaptura, setUltimaCaptura] = useState("--:--:--");
+
+    const [fps] = useState(30);
+
+    const [resolucao] = useState("1280 x 720");
+
+    const [status] = useState("READY");
 
     useEffect(() => {
 
@@ -10,29 +30,36 @@ export default function CameraFeed() {
 
             try {
 
-                const stream = await navigator.mediaDevices.getUserMedia({
+                const stream =
+                    await navigator.mediaDevices.getUserMedia({
 
-                    video: {
-                        width: 1280,
-                        height: 720,
-                        facingMode: "environment"
-                    },
+                        video: {
 
-                    audio: false
+                            width: 1280,
 
-                });
+                            height: 720,
+
+                            facingMode: "environment"
+
+                        },
+
+                        audio: false
+
+                    });
 
                 if (videoRef.current) {
 
                     videoRef.current.srcObject = stream;
 
+                    setCameraOnline(true);
+
                 }
 
-            } catch (error) {
+            }
 
-                console.error("Erro ao acessar câmera:", error);
+            catch {
 
-                alert("Não foi possível acessar a câmera.");
+                setCameraOnline(false);
 
             }
 
@@ -42,13 +69,32 @@ export default function CameraFeed() {
 
         return () => {
 
-            const stream = videoRef.current?.srcObject as MediaStream;
+            const stream =
+                videoRef.current?.srcObject as MediaStream;
 
             stream?.getTracks().forEach(track => track.stop());
 
         };
 
     }, []);
+
+    function selecionarImagem(
+        event: React.ChangeEvent<HTMLInputElement>
+    ) {
+
+        const file = event.target.files?.[0];
+
+        if (!file) return;
+
+        setUltimaCaptura(
+
+            new Date().toLocaleTimeString()
+
+        );
+
+        onCapture(file);
+
+    }
 
     return (
 
@@ -58,14 +104,99 @@ export default function CameraFeed() {
 
             <div className="camera-box">
 
-                <video
-                    ref={videoRef}
-                    autoPlay
-                    playsInline
-                    muted
-                />
+                {
+
+                    cameraOnline
+
+                        ?
+
+                        <video
+                            ref={videoRef}
+                            autoPlay
+                            muted
+                            playsInline
+                        />
+
+                        :
+
+                        <div className="camera-offline">
+
+                            NO CAMERA DETECTED
+
+                            <small>
+
+                                Connect a USB camera
+                                or use TEST IMAGE.
+
+                            </small>
+
+                        </div>
+
+                }
 
             </div>
+
+            <canvas
+                ref={canvasRef}
+                style={{ display: "none" }}
+            />
+
+            <div className="camera-info">
+
+                <div>
+
+                    <strong>Status</strong>
+
+                    {cameraOnline ? " 🟢 ONLINE" : " 🔴 OFFLINE"}
+
+                </div>
+
+                <div>
+
+                    <strong>FPS</strong>
+
+                    {fps}
+
+                </div>
+
+                <div>
+
+                    <strong>Resolution</strong>
+
+                    {resolucao}
+
+                </div>
+
+                <div>
+
+                    <strong>Inspection</strong>
+
+                    {status}
+
+                </div>
+
+                <div>
+
+                    <strong>Last Capture</strong>
+
+                    {ultimaCaptura}
+
+                </div>
+
+            </div>
+
+            <label className="capture-button">
+
+                TEST IMAGE
+
+                <input
+                    hidden
+                    type="file"
+                    accept="image/*"
+                    onChange={selecionarImagem}
+                />
+
+            </label>
 
         </div>
 

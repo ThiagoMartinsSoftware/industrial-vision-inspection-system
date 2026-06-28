@@ -1,4 +1,25 @@
-export default function ShiftPanel() {
+type ShiftPanelProps = {
+    turno: {
+        total: number;
+        aprovadas: number;
+        reprovadas: number;
+    };
+
+    onNovoTurno: () => void;
+};
+
+export default function ShiftPanel({
+    turno,
+    onNovoTurno,
+}: ShiftPanelProps) {
+
+    const precisao =
+        turno.total === 0
+            ? 0
+            : (
+                (turno.aprovadas / turno.total) *
+                100
+            ).toFixed(2);
 
     return (
 
@@ -6,15 +27,33 @@ export default function ShiftPanel() {
 
             <h2>TODAY</h2>
 
-            <p>Parts: 1254</p>
+            <p>
 
-            <p>Approved: 1248</p>
+                Parts: {turno.total}
 
-            <p>Rejected: 6</p>
+            </p>
 
-            <p>Accuracy: 99.52%</p>
+            <p>
 
-            <button>
+                Approved: {turno.aprovadas}
+
+            </p>
+
+            <p>
+
+                Rejected: {turno.reprovadas}
+
+            </p>
+
+            <p>
+
+                Accuracy: {precisao}%
+
+            </p>
+
+            <button
+                onClick={onNovoTurno}
+            >
 
                 NEW SHIFT
 

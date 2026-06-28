@@ -1,4 +1,24 @@
-export default function StatusPanel() {
+import "./StatusPanel.module.css";
+
+type StatusPanelProps = {
+
+    cameraOnline: boolean;
+
+    backendOnline: boolean;
+
+    inspecao: string;
+
+};
+
+export default function StatusPanel({
+
+    cameraOnline,
+
+    backendOnline,
+
+    inspecao
+
+}: StatusPanelProps) {
 
     return (
 
@@ -8,13 +28,69 @@ export default function StatusPanel() {
 
             <div className="status-grid">
 
-                <p>Camera ● ONLINE</p>
+                <div>
 
-                <p>AI Model ● ONLINE</p>
+                    Camera
 
-                <p>Backend ● ONLINE</p>
+                    <span>
 
-                <p>Inspection ● READY</p>
+                        {
+
+                            cameraOnline
+
+                                ? "🟢 ONLINE"
+
+                                : "🔴 OFFLINE"
+
+                        }
+
+                    </span>
+
+                </div>
+
+                <div>
+
+                    AI Model
+
+                    <span>
+
+                        🟢 IVIS 1.0
+
+                    </span>
+
+                </div>
+
+                <div>
+
+                    Backend
+
+                    <span>
+
+                        {
+
+                            backendOnline
+
+                                ? "🟢 ONLINE"
+
+                                : "🔴 OFFLINE"
+
+                        }
+
+                    </span>
+
+                </div>
+
+                <div>
+
+                    Inspection
+
+                    <span>
+
+                        {inspecao}
+
+                    </span>
+
+                </div>
 
             </div>
 

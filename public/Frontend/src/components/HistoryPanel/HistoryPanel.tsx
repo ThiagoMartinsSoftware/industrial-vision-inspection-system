@@ -1,4 +1,10 @@
-export default function HistoryPanel() {
+type HistoryPanelProps = {
+    historico: any[];
+};
+
+export default function HistoryPanel({
+    historico
+}: HistoryPanelProps) {
 
     return (
 
@@ -10,45 +16,67 @@ export default function HistoryPanel() {
 
                 <tbody>
 
-                    <tr>
+                    {
 
-                        <td>08:31:12</td>
+                        historico.length === 0 && (
 
-                        <td>APPROVED</td>
+                            <tr>
 
-                        <td>4/4</td>
+                                <td
+                                    colSpan={3}
+                                    style={{
+                                        textAlign: "center",
+                                        padding: "20px"
+                                    }}
+                                >
 
-                    </tr>
+                                    Waiting for first inspection...
 
-                    <tr>
+                                </td>
 
-                        <td>08:31:14</td>
+                            </tr>
 
-                        <td>APPROVED</td>
+                        )
 
-                        <td>4/4</td>
+                    }
 
-                    </tr>
+                    {
 
-                    <tr>
+                        historico.map((item, index) => (
 
-                        <td>08:31:16</td>
+                            <tr key={index}>
 
-                        <td>REJECTED</td>
+                                <td>
 
-                        <td>3/4</td>
+                                    {item.resultado.horario}
 
-                    </tr>
+                                </td>
 
-                    <tr>
+                                <td>
 
-                        <td>08:31:18</td>
+                                    {
 
-                        <td>APPROVED</td>
+                                        item.resultado.status === "APROVADA"
 
-                        <td>4/4</td>
+                                            ? "APPROVED"
 
-                    </tr>
+                                            : "REJECTED"
+
+                                    }
+
+                                </td>
+
+                                <td>
+
+                                    {item.resultado.pinos}/4
+
+                                </td>
+
+                            </tr>
+
+                        ))
+
+                    }
 
                 </tbody>
 
