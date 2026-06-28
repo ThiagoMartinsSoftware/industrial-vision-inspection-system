@@ -12,9 +12,13 @@ export default function CameraFeed({
 
     const videoRef = useRef<HTMLVideoElement>(null);
     const canvasRef = useRef<HTMLCanvasElement>(null);
+    const intervalRef = useRef<number | null>(null);
+
+    const analisando = useRef(false);
 
     const [cameraOnline, setCameraOnline] = useState(false);
     const [ultimaCaptura, setUltimaCaptura] = useState("--:--:--");
+
 
     const fps = 30;
     const resolucao = "1280 x 720";
@@ -22,33 +26,43 @@ export default function CameraFeed({
 
     useEffect(() => {
 
+        let stream: MediaStream | null = null;
+
         async function iniciarCamera() {
 
             try {
 
-                if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                const devices =
+                    await navigator.mediaDevices.enumerateDevices();
 
-                    throw new Error("Navegador não suporta acesso à câmera.");
+                const possuiCamera = devices.some(
+
+                    device => device.kind === "videoinput"
+
+                );
+
+                if (!possuiCamera) {
+
+                    throw new Error("Nenhuma câmera encontrada.");
 
                 }
 
-                const stream = await navigator.mediaDevices.getUserMedia({
+                stream =
+                    await navigator.mediaDevices.getUserMedia({
 
-                    video: {
+                        video: {
 
-                        width: {
-                            ideal: 1280
+                            width: { ideal: 1280 },
+
+                            height: { ideal: 720 },
+
+                            frameRate: { ideal: 30 }
+
                         },
 
-                        height: {
-                            ideal: 720
-                        }
+                        audio: false
 
-                    },
-
-                    audio: false
-
-                });
+                    });
 
                 if (videoRef.current) {
 
@@ -59,12 +73,23 @@ export default function CameraFeed({
                 }
 
                 setCameraOnline(true);
+                intervalRef.current = window.setInterval(() => {
+
+                    if (!analisando.current) {
+
+                        capturarFrame();
+
+                    }
+
+                }, 500);
+
+                console.log("✅ Webcam iniciada.");
 
             }
 
             catch (erro) {
 
-                console.error("Erro ao acessar câmera:", erro);
+                console.error("Erro ao iniciar webcam:", erro);
 
                 setCameraOnline(false);
 
@@ -76,14 +101,17 @@ export default function CameraFeed({
 
         return () => {
 
-            const stream = videoRef.current?.srcObject as MediaStream;
+            if (intervalRef.current) {
+
+                clearInterval(intervalRef.current);
+
+            }
 
             stream?.getTracks().forEach(track => track.stop());
 
         };
 
     }, []);
-
     function selecionarImagem(
         event: React.ChangeEvent<HTMLInputElement>
     ) {
@@ -97,6 +125,42 @@ export default function CameraFeed({
         );
 
         onCapture(file);
+
+    }
+
+    function capturarFrame() {
+
+        if (!videoRef.current) return;
+
+        if (!canvasRef.current) return;
+
+        const video = videoRef.current;
+
+        const canvas = canvasRef.current;
+
+        canvas.width = video.videoWidth;
+
+        canvas.height = video.videoHeight;
+
+        const ctx = canvas.getContext("2d");
+
+        if (!ctx) return;
+
+        ctx.drawImage(
+
+            video,
+
+            0,
+
+            0,
+
+            canvas.width,
+
+            canvas.height
+
+        );
+
+        console.log("📸 Frame capturado");
 
     }
 
@@ -120,11 +184,21 @@ export default function CameraFeed({
 
                             autoPlay
 
-                            playsInline
-
                             muted
 
+                            playsInline
+
                             controls={false}
+
+                            style={{
+
+                                width: "100%",
+
+                                height: "100%",
+
+                                objectFit: "cover"
+
+                            }}
 
                         />
 
