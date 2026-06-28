@@ -1,10 +1,30 @@
-type HistoryPanelProps = {
-    historico: any[];
+type ItemHistorico = {
+
+    resultado: {
+
+        status: string;
+
+        pinos: number;
+
+        horario: string;
+
+        tempo: number;
+
+    };
+
+};
+
+type Props = {
+
+    historico: ItemHistorico[];
+
 };
 
 export default function HistoryPanel({
+
     historico
-}: HistoryPanelProps) {
+
+}: Props) {
 
     return (
 
@@ -14,67 +34,95 @@ export default function HistoryPanel({
 
             <table>
 
+                <thead>
+
+                    <tr>
+
+                        <th>TIME</th>
+
+                        <th>STATUS</th>
+
+                        <th>PINS</th>
+
+                        <th>TIME(ms)</th>
+
+                    </tr>
+
+                </thead>
+
                 <tbody>
 
                     {
 
-                        historico.length === 0 && (
+                        historico.length === 0
+
+                            ?
 
                             <tr>
 
                                 <td
-                                    colSpan={3}
+                                    colSpan={4}
                                     style={{
                                         textAlign: "center",
-                                        padding: "20px"
+                                        color: "#777"
                                     }}
                                 >
 
-                                    Waiting for first inspection...
+                                    No inspections yet
 
                                 </td>
 
                             </tr>
 
-                        )
+                            :
 
-                    }
+                            historico.map(
 
-                    {
+                                (item, index) => (
 
-                        historico.map((item, index) => (
+                                    <tr key={index}>
 
-                            <tr key={index}>
+                                        <td>
 
-                                <td>
+                                            {item.resultado.horario}
 
-                                    {item.resultado.horario}
+                                        </td>
 
-                                </td>
+                                        <td>
 
-                                <td>
+                                            {
 
-                                    {
+                                                item.resultado.status === "APROVADA"
 
-                                        item.resultado.status === "APROVADA"
+                                                    ?
 
-                                            ? "APPROVED"
+                                                    "🟢 APPROVED"
 
-                                            : "REJECTED"
+                                                    :
 
-                                    }
+                                                    "🔴 REJECTED"
 
-                                </td>
+                                            }
 
-                                <td>
+                                        </td>
 
-                                    {item.resultado.pinos}/4
+                                        <td>
 
-                                </td>
+                                            {item.resultado.pinos}/4
 
-                            </tr>
+                                        </td>
 
-                        ))
+                                        <td>
+
+                                            {item.resultado.tempo}
+
+                                        </td>
+
+                                    </tr>
+
+                                )
+
+                            )
 
                     }
 

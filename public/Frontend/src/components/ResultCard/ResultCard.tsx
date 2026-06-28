@@ -1,113 +1,119 @@
-import "./ResultCard.module.css";
-
-type ResultCardProps = {
-    resultado: any;
+type Resultado = {
+    resultado: {
+        status: string;
+        pinos: number;
+        tempo: number;
+        horario: string;
+        id: string;
+        confianca: number;
+        modelo: string;
+    };
 };
 
-export default function ResultCard({
-    resultado
-}: ResultCardProps) {
+type Props = {
+    resultado: Resultado | null;
+};
 
-    if (!resultado) {
-
-        return (
-
-            <div className="result">
-
-                <h2>RESULT</h2>
-
-                <div className="result-box waiting">
-
-                    <h1>WAITING</h1>
-
-                    <div className="result-grid">
-
-                        <p><strong>Status</strong> Waiting inspection</p>
-                        <p><strong>Pins</strong> - / 4</p>
-                        <p><strong>Latency</strong> - ms</p>
-                        <p><strong>Part ID</strong> --------</p>
-                        <p><strong>Confidence</strong> -- %</p>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-        );
-
-    }
+export default function ResultCard({ resultado }: Props) {
 
     const aprovado =
-        resultado.resultado.status === "APROVADA";
-
-    const confianca = aprovado ? "99.84%" : "97.12%";
+        resultado?.resultado.status === "APROVADA";
 
     return (
 
         <div className="result">
 
-            <h2>RESULT</h2>
+            <h2>RESULTADO</h2>
 
-            <div className={`result-box ${aprovado ? "approved" : "rejected"}`}>
+            <div
+                className="result-box"
+                style={{
+                    background: aprovado ? "#1e5e2a" : "#7a1f1f",
+                    transition: ".3s"
+                }}
+            >
 
                 <h1>
 
-                    {aprovado ? "APPROVED" : "REJECTED"}
+                    {
+                        resultado
+                            ? resultado.resultado.status
+                            : "AGUARDANDO"
+                    }
 
                 </h1>
 
-                <div className="result-grid">
+                <p>
 
-                    <p>
+                    <strong>Status:</strong>{" "}
 
-                        <strong>Status</strong>
+                    {
+                        resultado
+                            ? "Inspeção concluída"
+                            : "Aguardando inspeção"
+                    }
 
-                        {resultado.resultado.status}
+                </p>
 
-                    </p>
+                <p>
 
-                    <p>
+                    <strong>Pinos:</strong>{" "}
 
-                        <strong>Pins</strong>
+                    {
+                        resultado
+                            ? `${resultado.resultado.pinos} / 4`
+                            : "-- / 4"
+                    }
 
-                        {resultado.resultado.pinos} / 4
+                </p>
 
-                    </p>
+                <p>
 
-                    <p>
+                    <strong>Latência:</strong>{" "}
 
-                        <strong>Latency</strong>
+                    {
+                        resultado
+                            ? `${resultado.resultado.tempo} ms`
+                            : "-- ms"
+                    }
 
-                        {resultado.resultado.tempo} ms
+                </p>
 
-                    </p>
+                <p>
 
-                    <p>
+                    <strong>ID da peça:</strong>{" "}
 
-                        <strong>Part ID</strong>
+                    {
+                        resultado
+                            ? resultado.resultado.id
+                            : "---------"
+                    }
 
-                        {resultado.resultado.id}
+                </p>
 
-                    </p>
+                <p>
 
-                    <p>
+                    <strong>Confiança:</strong>{" "}
 
-                        <strong>Confidence</strong>
+                    {
+                        resultado
+                            ? `${resultado.resultado.confianca}%`
+                            : "-- %"
+                    }
 
-                        {confianca}
+                </p>
 
-                    </p>
+                <p>
 
-                    <p>
+                    <strong>Captura:</strong>{" "}
 
-                        <strong>Capture</strong>
+                    {
+                        resultado
+                            ? resultado.resultado.horario
+                            : "--:--:--"
+                    }
 
-                        {resultado.resultado.horario}
-
-                    </p>
-
-                </div>
+                </p>
 
             </div>
 

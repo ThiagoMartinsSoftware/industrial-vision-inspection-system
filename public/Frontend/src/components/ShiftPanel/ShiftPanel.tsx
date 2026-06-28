@@ -1,25 +1,28 @@
-type ShiftPanelProps = {
-    turno: {
-        total: number;
-        aprovadas: number;
-        reprovadas: number;
-    };
+type Turno = {
+    total: number;
+    aprovadas: number;
+    reprovadas: number;
+};
 
+type Props = {
+    turno: Turno;
     onNovoTurno: () => void;
 };
 
 export default function ShiftPanel({
+
     turno,
-    onNovoTurno,
-}: ShiftPanelProps) {
+
+    onNovoTurno
+
+}: Props) {
 
     const precisao =
-        turno.total === 0
-            ? 0
-            : (
-                (turno.aprovadas / turno.total) *
-                100
-            ).toFixed(2);
+        turno.total > 0
+            ? (
+                (turno.aprovadas / turno.total) * 100
+            ).toFixed(2)
+            : "0.00";
 
     return (
 
@@ -27,31 +30,56 @@ export default function ShiftPanel({
 
             <h2>TODAY</h2>
 
-            <p>
+            <div className="shift-grid">
 
-                Parts: {turno.total}
+                <div>
 
-            </p>
+                    <span>Parts</span>
 
-            <p>
+                    <strong>{turno.total}</strong>
 
-                Approved: {turno.aprovadas}
+                </div>
 
-            </p>
+                <div>
 
-            <p>
+                    <span>Approved</span>
 
-                Rejected: {turno.reprovadas}
+                    <strong style={{ color: "#2ecc71" }}>
 
-            </p>
+                        {turno.aprovadas}
 
-            <p>
+                    </strong>
 
-                Accuracy: {precisao}%
+                </div>
 
-            </p>
+                <div>
+
+                    <span>Rejected</span>
+
+                    <strong style={{ color: "#e74c3c" }}>
+
+                        {turno.reprovadas}
+
+                    </strong>
+
+                </div>
+
+                <div>
+
+                    <span>Accuracy</span>
+
+                    <strong>
+
+                        {precisao}%
+
+                    </strong>
+
+                </div>
+
+            </div>
 
             <button
+                className="new-shift"
                 onClick={onNovoTurno}
             >
 
