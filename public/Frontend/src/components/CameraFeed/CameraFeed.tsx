@@ -11,18 +11,14 @@ export default function CameraFeed({
 }: CameraFeedProps) {
 
     const videoRef = useRef<HTMLVideoElement>(null);
-
     const canvasRef = useRef<HTMLCanvasElement>(null);
 
     const [cameraOnline, setCameraOnline] = useState(false);
-
     const [ultimaCaptura, setUltimaCaptura] = useState("--:--:--");
 
-    const [fps] = useState(30);
-
-    const [resolucao] = useState("1280 x 720");
-
-    const [status] = useState("READY");
+    const fps = 30;
+    const resolucao = "1280 x 720";
+    const status = "READY";
 
     useEffect(() => {
 
@@ -30,34 +26,45 @@ export default function CameraFeed({
 
             try {
 
-                const stream =
-                    await navigator.mediaDevices.getUserMedia({
+                if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
 
-                        video: {
+                    throw new Error("Navegador não suporta acesso à câmera.");
 
-                            width: 1280,
+                }
 
-                            height: 720,
+                const stream = await navigator.mediaDevices.getUserMedia({
 
-                            facingMode: "environment"
+                    video: {
 
+                        width: {
+                            ideal: 1280
                         },
 
-                        audio: false
+                        height: {
+                            ideal: 720
+                        }
 
-                    });
+                    },
+
+                    audio: false
+
+                });
 
                 if (videoRef.current) {
 
                     videoRef.current.srcObject = stream;
 
-                    setCameraOnline(true);
+                    await videoRef.current.play();
 
                 }
 
+                setCameraOnline(true);
+
             }
 
-            catch {
+            catch (erro) {
+
+                console.error("Erro ao acessar câmera:", erro);
 
                 setCameraOnline(false);
 
@@ -69,8 +76,7 @@ export default function CameraFeed({
 
         return () => {
 
-            const stream =
-                videoRef.current?.srcObject as MediaStream;
+            const stream = videoRef.current?.srcObject as MediaStream;
 
             stream?.getTracks().forEach(track => track.stop());
 
@@ -87,9 +93,7 @@ export default function CameraFeed({
         if (!file) return;
 
         setUltimaCaptura(
-
             new Date().toLocaleTimeString()
-
         );
 
         onCapture(file);
@@ -111,22 +115,28 @@ export default function CameraFeed({
                         ?
 
                         <video
+
                             ref={videoRef}
+
                             autoPlay
-                            muted
+
                             playsInline
+
+                            muted
+
+                            controls={false}
+
                         />
 
                         :
 
                         <div className="camera-offline">
 
-                            NO CAMERA DETECTED
+                            <h3>NO CAMERA DETECTED</h3>
 
                             <small>
 
-                                Connect a USB camera
-                                or use TEST IMAGE.
+                                Connect a USB camera or use TEST IMAGE.
 
                             </small>
 
@@ -137,8 +147,11 @@ export default function CameraFeed({
             </div>
 
             <canvas
+
                 ref={canvasRef}
+
                 style={{ display: "none" }}
+
             />
 
             <div className="camera-info">
@@ -190,10 +203,15 @@ export default function CameraFeed({
                 TEST IMAGE
 
                 <input
+
                     hidden
+
                     type="file"
+
                     accept="image/*"
+
                     onChange={selecionarImagem}
+
                 />
 
             </label>
