@@ -134,6 +134,10 @@ export default function CameraFeed({
 
         if (!canvasRef.current) return;
 
+        if (analisando.current) return;
+
+        analisando.current = true;
+
         const video = videoRef.current;
 
         const canvas = canvasRef.current;
@@ -144,7 +148,13 @@ export default function CameraFeed({
 
         const ctx = canvas.getContext("2d");
 
-        if (!ctx) return;
+        if (!ctx) {
+
+            analisando.current = false;
+
+            return;
+
+        }
 
         ctx.drawImage(
 
@@ -160,7 +170,49 @@ export default function CameraFeed({
 
         );
 
-        console.log("📸 Frame capturado");
+        canvas.toBlob(
+
+            (blob) => {
+
+                if (!blob) {
+
+                    analisando.current = false;
+
+                    return;
+
+                }
+
+                const arquivo = new File(
+
+                    [blob],
+
+                    "frame.jpg",
+
+                    {
+
+                        type: "image/jpeg"
+
+                    }
+
+                );
+
+                setUltimaCaptura(
+
+                    new Date().toLocaleTimeString()
+
+                );
+
+                onCapture(arquivo);
+
+                analisando.current = false;
+
+            },
+
+            "image/jpeg",
+
+            0.95
+
+        );
 
     }
 

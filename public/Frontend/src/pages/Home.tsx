@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { api } from "../services/api";
 
 import CameraFeed from "../components/CameraFeed/CameraFeed";
@@ -15,6 +15,10 @@ export default function Home() {
 
   const [historico, setHistorico] = useState<any[]>([]);
 
+  const analisando = useRef(false);
+
+
+
   const [turno, setTurno] = useState({
     total: 0,
     aprovadas: 0,
@@ -22,6 +26,10 @@ export default function Home() {
   });
 
   async function capturarImagem(file: File) {
+
+    if (analisando.current) return;
+
+    analisando.current = true;
 
     try {
 
@@ -78,10 +86,11 @@ export default function Home() {
             : anterior.reprovadas
 
       }));
-
+      analisando.current = false;
     }
 
     catch (erro) {
+      analisando.current = false;
 
       console.error(erro);
 
